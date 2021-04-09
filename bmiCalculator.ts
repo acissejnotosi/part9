@@ -1,3 +1,8 @@
+interface InputValues {
+  value1: number;
+  value2: number;
+}
+
 const calculateBmi = function (height: number, weigth: number): String {
   if (height === 0) throw new Error("Height is invalid");
   let bmi = weigth / (Math.pow(height / 100, 2));
@@ -10,4 +15,23 @@ const calculateBmi = function (height: number, weigth: number): String {
     return 'Overweight'
 }
 
-console.log(calculateBmi(180, 74));
+const parseArgumentsBmiCalculator = (args: Array<string>): InputValues => {
+  if (args.length < 4) throw new Error('Not enough arguments');
+  if (args.length > 4) throw new Error('Too many arguments');
+
+  if (!isNaN(Number(args[2])) && !isNaN(Number(args[3]))) {
+    return {
+      value1: Number(args[2]),
+      value2: Number(args[3])
+    }
+  } else {
+    throw new Error('Provided values were not numbers!');
+  }
+}
+
+try {
+  const { value1, value2 } = parseArgumentsBmiCalculator(process.argv);
+  console.log(calculateBmi(value1, value2));
+} catch (e) {
+  console.log('Error, something bad happened, message: ', e.message);
+}

@@ -9,36 +9,43 @@ interface Exercises {
 }
 
 interface InputValues {
-  value1: Array<number>;
-  value2: number;
+  value1: number;
+  value2: Array<number>;
 }
 
-const calculateExercises = function (period: Array<number>, targetAmount: number) {
+const calculateExercises = function (targetAmount: number, period: Array<number>) {
 
   let totalHours = period.reduce((acc, curr) => acc += curr);
   let average = totalHours / period.length;
-
+  let rating = average < targetAmount ? 1 : average === targetAmount ? 2 : 3;
   const result: Exercises = {
     periodLength: period.length,
     trainingDays: period.map(day => day > 0).length,
     success: totalHours >= targetAmount ? true : false,
     average: average,
     target: targetAmount,
-    rating: average < targetAmount ? 1 : average === targetAmount ? 2 : 3,
-    ratingDescription: 1 ? 'It is a pitch you didn\'t go well, try next time' : 2 ? 'not too bad but could be better' : 'Awesome, you did a great job!'
+    rating: rating,
+    ratingDescription: rating === 1 ? 'It is a pitch you didn\'t go well, try next time' : rating === 2 ? 'not too bad but could be better' : 'Awesome, you did a great job!'
   }
 
   return result;
 }
 
-const parseArguments = (args: Array<string>): InputValues => {
+const parseArgumentsForCalculator = (args: Array<string>): InputValues => {
   if (args.length < 4) throw new Error('Not enough arguments');
-  if (args.length > 4) throw new Error('Too many arguments');
 
+  let values = args.filter((val, i) => {
+    if (i >= 3 && i < args.length && !isNaN(Number(val))) {
+      console.log(val);
+      return Number(val)
+    }
+  })
+
+  console.log('values', values);
   if (!isNaN(Number(args[2])) && !isNaN(Number(args[3]))) {
     return {
-      value1: Array.from(String(args[2]), Number),
-      value2: Number(args[3])
+      value1: Number(args[2]),
+      value2: Array.from(values, Number)
     }
   } else {
     throw new Error('Provided values were not numbers!');
@@ -46,7 +53,7 @@ const parseArguments = (args: Array<string>): InputValues => {
 }
 
 try {
-  const { value1, value2 } = parseArguments(process.argv);
+  const { value1, value2 } = parseArgumentsForCalculator(process.argv);
   console.log(calculateExercises(value1, value2));
 } catch (e) {
   console.log('Error, something bad happened, message: ', e.message);
